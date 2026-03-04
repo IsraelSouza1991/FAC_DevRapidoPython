@@ -1,0 +1,7 @@
+Neste 
+Código 4 
+vamos 
+trabalhar a leitura 
+do arquivo 
+que contém 
+várias linhas.
