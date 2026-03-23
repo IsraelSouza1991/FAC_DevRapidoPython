@@ -1,6 +1,6 @@
 import sqlite3 as conector
 
-conexao = conector.connect(".\\db_DevRapidoPython")
+conexao = conector.connect("codigo_9 Conectar Banco/db_DevRapidoPython.db")
 
 cursor = conexao.cursor()
 
@@ -10,3 +10,6 @@ print(dado.fetchall())
 
 cursor.fetchall()
 conexao.commit()
+
+cursor.close()
+conexao.close()
