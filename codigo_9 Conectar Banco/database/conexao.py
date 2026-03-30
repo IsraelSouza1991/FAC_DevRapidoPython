@@ -1,6 +1,15 @@
 import sqlite3 as conector
 import os
 from pathlib import Path
+import logging
+import tkinter as tk
+from tkinter import messagebox, filedialog
+
+# Configurar logging
+logging.basicConfig(
+    level=logging.INFO, 
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
 
 class BancoDeDados():
     def __init__(self):
@@ -39,19 +48,58 @@ class BancoDeDados():
                 print("Conexão com o banco de dados fechada.")
 
     def conectar_banco(self):
+        """Abre um diálogo para selecionar um arquivo de banco de dados e se conecta."""
         try:
-            if not self.nome_banco:
-                raise ValueError("Nome do banco não foi definido. Execute criar_banco() primeiro.")
+            # Criar janela raiz invisível para o filedialog
+            root = tk.Tk()
+            root.withdraw()  # Esconder a janela
             
+            # Abrir diálogo de seleção de arquivo
+            arquivo_banco = filedialog.askopenfilename(
+                title="Selecionar banco de dados",
+                initialdir=str(self.pasta_database),
+                filetypes=[("Banco de Dados", "*.db"), ("Todos os arquivos", "*.*")]
+            )
+            
+            root.destroy()
+            
+            if not arquivo_banco:
+                messagebox.showwarning("Aviso", "Nenhum arquivo foi selecionado.")
+                return False
+            
+            # Conectar ao banco selecionado
+            self.nome_banco = arquivo_banco
             self.conexao = conector.connect(self.nome_banco)
             self.cursor = self.conexao.cursor()
-            print(f"Conexão estabelecida com: {self.nome_banco}")
+            
+            messagebox.showinfo("Sucesso", f"Conectado ao banco: {os.path.basename(arquivo_banco)}")
+            logging.info(f"Conectado ao banco de dados: {self.nome_banco}")
+            return True
+            
         except conector.DatabaseError as e:
-            print(f"Erro de banco de dados: {e}")
-            if self.conexao:
-                self.conexao.close()
+            messagebox.showerror("Erro", f"Erro ao conectar ao banco de dados: {e}")
+            logging.error(f"Erro ao conectar: {e}")
+            return False
+        except Exception as e:
+            messagebox.showerror("Erro", f"Erro inesperado: {e}")
+            logging.error(f"Erro inesperado: {e}")
+            return False
                 
     def desconectar_banco(self):
-        if self.conexao:
-            self.conexao.close()
-            print("Conexão com o banco de dados fechada.")
+        """Desconecta do banco de dados."""
+        try:
+            if self.cursor:
+                self.cursor.close()
+            if self.conexao:
+                self.conexao.close()
+                logging.info("Desconectado do banco de dados.")
+                return True
+        except conector.DatabaseError as e:
+            logging.error(f"Erro ao desconectar: {e}")
+            return False
+
+if __name__ == "__main__":
+    banco = BancoDeDados()
+    banco.criar_banco()
+    banco.conectar_banco()
+    banco.desconectar_banco()
