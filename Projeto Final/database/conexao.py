@@ -51,8 +51,8 @@ class BancoDeDados():
         """Abre um diálogo para selecionar um arquivo de banco de dados e se conecta."""
         try:
             # Criar janela raiz invisível para o filedialog
-            root = tk.Tk()
-            root.withdraw()  # Esconder a janela
+            #root = tk.Tk()
+            #root.withdraw()  # Esconder a janela
             
             # Abrir diálogo de seleção de arquivo
             arquivo_banco = filedialog.askopenfilename(
@@ -61,7 +61,7 @@ class BancoDeDados():
                 filetypes=[("Banco de Dados", "*.db"), ("Todos os arquivos", "*.*")]
             )
             
-            root.destroy()
+            #root.destroy()
             
             if not arquivo_banco:
                 messagebox.showwarning("Aviso", "Nenhum arquivo foi selecionado.")
@@ -97,9 +97,3 @@ class BancoDeDados():
         except conector.DatabaseError as e:
             logging.error(f"Erro ao desconectar: {e}")
             return False
-
-if __name__ == "__main__":
-    banco = BancoDeDados()
-    banco.criar_banco()
-    banco.conectar_banco()
-    banco.desconectar_banco()
